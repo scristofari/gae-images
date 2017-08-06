@@ -1,10 +1,7 @@
 package image
 
 import (
-	"fmt"
 	"net/http"
-
-	"github.com/gorilla/mux"
 
 	"google.golang.org/appengine"
 	"google.golang.org/appengine/blobstore"
@@ -12,8 +9,7 @@ import (
 	"google.golang.org/appengine/log"
 )
 
-// Generate the url for the upload - url 'one-shot'
-func handleGetUrlForUpload(w http.ResponseWriter, r *http.Request) {
+func handleUploadURL(w http.ResponseWriter, r *http.Request) {
 	ctx := appengine.NewContext(r)
 	uploadURL, err := blobstore.UploadURL(ctx, "/upload", nil)
 	if err != nil {
@@ -23,10 +19,9 @@ func handleGetUrlForUpload(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusOK)
-	fmt.Fprint(w, uploadURL.String())
+	w.Write([]byte(uploadURL.String()))
 }
 
-// Upload the file
 func handleUpload(w http.ResponseWriter, r *http.Request) {
 	ctx := appengine.NewContext(r)
 	blobs, _, err := blobstore.ParseUpload(r)
@@ -38,7 +33,7 @@ func handleUpload(w http.ResponseWriter, r *http.Request) {
 	file := blobs["file"]
 	if len(file) == 0 {
 		log.Errorf(ctx, err.Error())
-		http.Error(w, "No file found or url upload not generated", http.StatusBadRequest)
+		http.Error(w, "No file found", http.StatusBadRequest)
 		return
 	}
 
@@ -48,12 +43,12 @@ func handleUpload(w http.ResponseWriter, r *http.Request) {
 	})
 
 	w.WriteHeader(http.StatusOK)
-	fmt.Fprint(w, url)
+	w.Write([]byte(url.String()))
 }
 
 func init() {
-	r := mux.NewRouter().StrictSlash(true)
-	r.HandleFunc("/generate-url", handleGetUrlForUpload).Methods("GET")
-	r.HandleFunc("/upload", handleUpload).Methods("POST")
+	r := http.NewServeMux()
+	r.HandleFunc("/url", handleUploadURL)
+	r.HandleFunc("/upload", handleUpload)
 	http.Handle("/", r)
 }
