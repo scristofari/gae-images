@@ -32,7 +32,7 @@ func handleUpload(w http.ResponseWriter, r *http.Request) {
 	}
 	file := blobs["file"]
 	if len(file) == 0 {
-		log.Errorf(ctx, err.Error())
+		log.Warningf(ctx, "No file found")
 		http.Error(w, "No file found", http.StatusBadRequest)
 		return
 	}
