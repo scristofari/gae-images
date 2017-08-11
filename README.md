@@ -35,16 +35,16 @@ handlers:
 
 * Two routes are provided:
 
- "/generate-url", provide a one-shot upload url. (GET)
+ "/url", provide a one-shot upload url. (GET)
 
   "/upload", the url used by the blobstore to upload the file, and get the image url after that. (POST)
 
 ``` go
 func init() {
-  r := mux.NewRouter().StrictSlash(true)
-  r.HandleFunc("/generate-url", handleGetUrlForUpload).Methods("GET")
-  r.HandleFunc("/upload", handleUpload).Methods("POST")
-  http.Handle("/", r)
+	r := http.NewServeMux()
+	r.HandleFunc("/url", handleUploadURL)
+	r.HandleFunc("/upload", handleUpload)
+	http.Handle("/", r)
 }
 ```
 
@@ -62,7 +62,7 @@ func handleGetUrlForUpload(w http.ResponseWriter, r *http.Request) {
   }
 
   w.WriteHeader(http.StatusOK)
-  fmt.Fprint(w, uploadURL.String())
+  w.Write([]byte(uploadURL.String()))
 }
 ```
 
@@ -95,7 +95,7 @@ func handleUpload(w http.ResponseWriter, r *http.Request) {
   })
 
   w.WriteHeader(http.StatusOK)
-  fmt.Fprint(w, url)
+  w.Write([]byte(url))
 }
 ```
 
