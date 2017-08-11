@@ -3,7 +3,6 @@ Google app engine - Handling upload / resize images
 
 ## Dependency: 
 
-* [gorilla mux](https://github.com/gorilla/mux) router 
 * [blobstore API](https://cloud.google.com/appengine/docs/go/images/) 
 
 ## What does the microservice do: 
