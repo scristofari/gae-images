@@ -18,7 +18,6 @@ func handleUploadURL(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.WriteHeader(http.StatusOK)
 	w.Write([]byte(uploadURL.String()))
 }
 
@@ -38,9 +37,14 @@ func handleUpload(w http.ResponseWriter, r *http.Request) {
 	}
 
 	bkey := file[0].BlobKey
-	url, _ := image.ServingURL(ctx, bkey, &image.ServingURLOptions{
+	url, err := image.ServingURL(ctx, bkey, &image.ServingURLOptions{
 		Secure: true,
 	})
+	if err != nil {
+		log.Errorf(ctx, err.Error())
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 
 	w.Write([]byte(url.String()))
 }
