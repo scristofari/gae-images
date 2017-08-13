@@ -42,7 +42,6 @@ func handleUpload(w http.ResponseWriter, r *http.Request) {
 		Secure: true,
 	})
 
-	w.WriteHeader(http.StatusOK)
 	w.Write([]byte(url.String()))
 }
 

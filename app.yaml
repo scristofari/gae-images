@@ -6,6 +6,9 @@ api_version: go1.8
 default_expiration: "1d"
 
 handlers:
+- url: /favicon\.ico
+  static_files: favicon.ico
+  upload: favicon\.ico
 - url: /.*
   script: _go_app
   secure: always
